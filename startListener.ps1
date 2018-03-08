@@ -1,0 +1,1 @@
+powershell -ExecutionPolicy RemoteSigned -File .\Listener.ps1
