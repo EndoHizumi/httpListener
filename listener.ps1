@@ -9,13 +9,17 @@ try {
         $request = $context.Request
         $request.rawUrl
         $responce = $context.Response
-        $content = [byte[]]"hello"
+        $enc = New-Object text.UTF8encoding
+        $content = [byte[]] $enc.GetBytes( "hello")
         $responce.OutputStream.Write($content, 0, $content.Length)   
+        $responce.OutputStream.Flush()
+        $responce.Close()
     }       
 }
 catch {
     Write-Error $_
     $responce.StatusCode = 500
-}finally{
     $responce.Close()
+}finally{
+    $listener.Dispose()
 }
