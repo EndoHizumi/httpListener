@@ -11,11 +11,11 @@ try {
         $responce = $context.Response
         $content = [byte[]]"hello"
         $responce.OutputStream.Write($content, 0, $content.Length)   
-    }
-        
+    }       
 }
 catch {
-    
+    Write-Error $_
+    $responce.StatusCode = 500
 }finally{
     $responce.Close()
 }
