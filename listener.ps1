@@ -10,7 +10,7 @@ try {
         $request.rawUrl
         $responce = $context.Response
         $enc = New-Object text.UTF8encoding
-        $content = [byte[]] $enc.GetBytes( "hello")
+        $content = [byte[]] $enc.GetBytes((get-content ".\index.html"))
         $responce.OutputStream.Write($content, 0, $content.Length)   
         $responce.OutputStream.Flush()
         $responce.Close()
@@ -20,6 +20,7 @@ catch {
     Write-Error $_
     $responce.StatusCode = 500
     $responce.Close()
-}finally{
+}
+finally {
     $listener.Dispose()
 }
