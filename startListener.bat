@@ -1,1 +1,2 @@
-powershell -ExecutionPolicy RemoteSigned -File .\Listener.ps1
+@echo off
+powershell -ExecutionPolicy RemoteSigned -File %~dp0Listener.ps1
