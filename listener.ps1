@@ -3,22 +3,52 @@ $urlRoot = "http://localhost:${port}/"
 $listener = New-Object net.httpListener
 $listener.Prefixes.Add($urlRoot)
 $listener.Start()
+$documentRoot = (Split-Path($MyInvocation.MyCommand.Path) -Parent) + "\"
+Write-Host "set documentRoot="$documentRoot
+
+
+function getMineType ($path) {
+    $info = New-Object System.IO.FileInfo($path)
+    $extesion = $info.Extension
+    
+    if ($extesion -eq "jpg" -or $extesion -eq"jpeg"){
+        return "image/jpeg"
+    }elseif ($extesion -eq "png") {
+        return "image/png"
+    }else{
+        return "text/html"
+    }
+}
+
 try {
     while ($true) {
-        $context = $listener.GetContext()
-        $request = $context.Request
-        $request.rawUrl
-        $responce = $context.Response
-        $enc = New-Object text.UTF8encoding
-        $content = [byte[]] $enc.GetBytes((get-content ".\index.html"))
-        $responce.OutputStream.Write($content, 0, $content.Length)   
-        $responce.OutputStream.Flush()
-        $responce.Close()
+    $context = $listener.GetContext()
+    $request = $context.Request
+    $responce = $context.Response
+    $requestPage = if ($request.rawUrl -ne "/") {
+     ($request.rawUrl).Substring(1)
+    }
+    else {
+        "index.html"
+    }
+    write-host "requst:"$documentRoot${requestPage}
+    $enc = New-Object text.UTF8encoding
+    if(Test-Path $documentRoot$requestPage){
+        $responce.ContentType = (getMineType $documentRoot$requestPage)
+        $content =  [byte[]] $enc.GetBytes((get-content -raw $documentRoot$requestPage))
+    } else {
+        $content =  [byte[]] $enc.GetBytes("<h1>404 Not Found.</h1>`r`n check your request.")
+        $responce.StatusCode = 404
+    }
+    $responce.OutputStream.Write($content, 0, $content.Length)    
+    $responce.Close()
     }       
 }
 catch {
     Write-Error $_
+    $content =  [byte[]] $enc.GetBytes("<h1>500 Internal Server Error</h1>")
     $responce.StatusCode = 500
+    $responce.OutputStream.Write($content, 0, $content.Length)    
     $responce.Close()
 }
 finally {
