@@ -31,7 +31,7 @@ try {
     else {
         "index.html"
     }
-    write-host "requst:"$documentRoot${requestPage}
+    write-host "request:$($request.HttpMethod) ${requestPage} HTTP $($request.ProtocolVersion)" 
     $enc = New-Object text.UTF8encoding
     if(Test-Path $documentRoot$requestPage){
         $responce.ContentType = (getMineType $documentRoot$requestPage)
@@ -42,6 +42,7 @@ try {
     }
     $responce.OutputStream.Write($content, 0, $content.Length)    
     $responce.Close()
+    Write-Host "responce:$($responce.StatusCode) $($responce.ContentType) ${requestPage}"
     }       
 }
 catch {
