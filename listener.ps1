@@ -11,9 +11,9 @@ function getMineType ($path) {
     $info = New-Object System.IO.FileInfo($path)
     $extesion = $info.Extension
     
-    if ($extesion -eq "jpg" -or $extesion -eq"jpeg"){
+    if ($extesion -eq ".jpg" -or $extesion -eq".jpeg"){
         return "image/jpeg"
-    }elseif ($extesion -eq "png") {
+    }elseif ($extesion -eq ".png") {
         return "image/png"
     }else{
         return "text/html"
@@ -35,7 +35,8 @@ try {
     $enc = New-Object text.UTF8encoding
     if(Test-Path $documentRoot$requestPage){
         $responce.ContentType = (getMineType $documentRoot$requestPage)
-        $content =  [byte[]] $enc.GetBytes((get-content -raw $documentRoot$requestPage))
+        $content = [System.IO.File]::ReadAllBytes($documentRoot+$requestPage)
+        #$content =  [byte[]] $enc.GetBytes((get-content -raw $documentRoot$requestPage))
     } else {
         $content =  [byte[]] $enc.GetBytes("<h1>404 Not Found.</h1>`r`n check your request.")
         $responce.StatusCode = 404
